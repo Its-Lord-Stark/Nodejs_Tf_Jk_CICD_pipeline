@@ -85,7 +85,6 @@ pipeline {
                     echo "ECR Registry URL after login: ${ECR_REGISTRY_URL}"
 
                     retry(3) {
-                        // Retry the docker push command up to 3 times
                         docker.withRegistry("https://${ECR_REGISTRY_URL}") {
                             docker.image("${DOCKER_IMAGE_TAG}").push()
                         }
