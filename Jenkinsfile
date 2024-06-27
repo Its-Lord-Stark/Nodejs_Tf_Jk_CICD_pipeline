@@ -32,21 +32,24 @@ pipeline{
             
         }
 
-        stage("Apply Terraform")
-        {
-            steps{
-                script{
-                    sh 'terraform init'
-                    sh 'terraform apply -auto-approve'
+stage("Apply Terraform") {
+    steps {
+        withCredentials([string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
+                         string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')]) {
+            script {
+                sh 'terraform init'
+                sh 'terraform apply -auto-approve'
 
-                    EC2_INSTANCE_IP = sh(script: 'terraform output -json ec2_instance_ip', returnStdout: true).trim()
-                    ECR_REPOSITORY_URL = sh(script: 'terraform output -json ecr_repository_url', returnStdout: true).trim()
+                EC2_INSTANCE_IP = sh(script: 'terraform output -json ec2_instance_ip', returnStdout: true).trim()
+                ECR_REPOSITORY_URL = sh(script: 'terraform output -json ecr_repository_url', returnStdout: true).trim()
 
-                    // echo "EC2 Instance IP: ${EC2_INSTANCE_IP}"
-                    // echo "ECR Repository URL: ${ECR_REPOSITORY_URL}"
-                }
+                // echo "EC2 Instance IP: ${EC2_INSTANCE_IP}"
+                // echo "ECR Repository URL: ${ECR_REPOSITORY_URL}"
             }
         }
+    }
+}
+
 
          stage('Push Docker Image to ECR') {
             steps {
