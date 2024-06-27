@@ -57,7 +57,7 @@ pipeline {
 
                     withCredentials([string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'), 
                                      string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        bat "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} --profile Stark1 | docker login --username AWS --password-stdin ${ECR_REGISTRY_URL}"
+                        bat "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} --profile=Stark1 | docker login --username AWS --password-stdin ${ECR_REGISTRY_URL}"
                     }
 
                     echo "ECR Registry URL after login: ${ECR_REGISTRY_URL}"
