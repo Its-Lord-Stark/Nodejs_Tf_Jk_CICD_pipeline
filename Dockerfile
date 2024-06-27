@@ -1,15 +1,19 @@
-FROM node:alpine
+# FROM node:alpine
 
-WORKDIR /usr/src/app
+# WORKDIR /usr/src/app
 
-COPY package*.json ./
+# COPY package*.json ./
 
-RUN npm install
+# RUN npm install
 
-COPY index.js ./
-COPY views ./views/
+# COPY index.js ./
+# COPY views ./views/
 
-EXPOSE 8100
+# EXPOSE 8100
 
 
-CMD ["node" , "index.js"]
+# CMD ["node" , "index.js"]
+
+
+FROM alpine:latest
+CMD ["echo", "Hello, World!"]
