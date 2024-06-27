@@ -86,7 +86,7 @@ pipeline {
                     retry(3) {
                         script {
                             echo "Pushing Docker image to ECR..."
-                            def pushCommand = "docker push ${ECR_REGISTRY_URL}/${DOCKER_IMAGE_TAG}"
+                            def pushCommand = "docker push ${ECR_REGISTRY_URL}}"
                             bat pushCommand
                             echo "Docker image pushed successfully"
                         }
