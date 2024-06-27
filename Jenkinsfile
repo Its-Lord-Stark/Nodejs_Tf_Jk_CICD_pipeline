@@ -96,12 +96,12 @@ pipeline {
         }
 
 
-        stage('Deploy to EC2') {
+     stages {
+        stage('Setup SSH Agent') {
             steps {
-                script {
-                    sshagent(credentials: ['ec2-ssh-key']) {
-                        bat "ssh -o StrictHostKeyChecking=no ${SSH_USER}@${EC2_INSTANCE_IP} 'docker pull ${ECR_REGISTRY_URL}/${DOCKER_IMAGE_TAG} && docker run -d -p 8100:8100 ${ECR_REGISTRY_URL}/${DOCKER_IMAGE_TAG}'"
-                    }
+                sshagent(['your-credentials-id']) {
+                    sh 'ssh-add -L' // list loaded keys to verify
+                    // Your SSH commands
                 }
             }
         }
