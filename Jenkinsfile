@@ -88,6 +88,8 @@ pipeline {
                         docker.withRegistry("https://${ECR_REGISTRY_URL}") {
                             docker.image("${DOCKER_IMAGE_TAG}").push()
                         }
+
+                        echo "Working good"
                     }
                 }
             }
