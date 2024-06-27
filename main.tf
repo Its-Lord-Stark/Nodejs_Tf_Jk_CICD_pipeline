@@ -19,6 +19,11 @@ resource "aws_iam_role" "my_instance_role" {
   })
 }
 
+resource "aws_iam_instance_profile" "my_instance_profile" {
+  name = "ec2-instance-profile"
+  role = aws_iam_role.my_instance_role.name
+}
+
 resource "aws_iam_role_policy" "ecr_policy" {
   name = "ecr-policy"
   role = aws_iam_role.my_instance_role.id
@@ -51,7 +56,7 @@ resource "aws_instance" "my_instance" {
     Name = "node-server-instance"
   }
 
-  iam_instance_profile = aws_iam_role.my_instance_role.name
+  iam_instance_profile = aws_iam_instance_profile.my_instance_profile.name
 }
 
 resource "aws_ecr_repository" "my_ecr_repo" {
