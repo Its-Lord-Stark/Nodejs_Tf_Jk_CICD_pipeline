@@ -4,9 +4,9 @@ pipeline {
         TF_CLI_ARGS_INIT = "-input=false"
         AWS_DEFAULT_REGION = "ap-south-1"
         DOCKER_IMAGE_TAG = "my-node-app:latest"
-        ECR_REGISTRY_URL = "Placeholder"
+        ECR_REGISTRY_URL = ""  // Placeholder for now
         AWS_ACCOUNT_ID = "939533572395"
-        EC2_INSTANCE_IP = "placeholder"
+        EC2_INSTANCE_IP = ""  // Placeholder for now
         SSH_USER = "ec2-user"
         SSH_KEY = credentials('ec2-ssh-key')
     }
@@ -34,11 +34,17 @@ pipeline {
                         bat 'terraform init'
                         bat 'terraform apply -auto-approve'
 
-                        def ec2InstanceIp = bat(script: 'terraform output -raw aws_instance_ip', returnStdout: true).trim()
+                        // Capture the outputs from Terraform
+                        def ec2InstanceIp = bat(script: 'terraform output -raw ec2_instance_ip', returnStdout: true).trim()
                         def ecrRegistryUrl = bat(script: 'terraform output -raw ecr_repository_url', returnStdout: true).trim()
 
+                        // Set the environment variables dynamically
                         env.EC2_INSTANCE_IP = ec2InstanceIp
                         env.ECR_REGISTRY_URL = ecrRegistryUrl
+
+                        // Print out the IP and URL for debugging
+                        echo "EC2 Instance IP: ${env.EC2_INSTANCE_IP}"
+                        echo "ECR Registry URL: ${env.ECR_REGISTRY_URL}"
                     }
                 }
             }
@@ -49,7 +55,7 @@ pipeline {
                 script {
                     withCredentials([string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'), 
                                      string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        bat "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY_URL}"
+                        bat "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin https://${ECR_REGISTRY_URL}"
                     }
 
                     docker.withRegistry("https://${ECR_REGISTRY_URL}", "ecr:ap-south-1:${AWS_ACCESS_KEY_ID}") {
