@@ -4,9 +4,9 @@ pipeline {
         TF_CLI_ARGS_INIT = "-input=false"
         AWS_DEFAULT_REGION = "ap-south-1"
         DOCKER_IMAGE_TAG = "my-node-app:latest"
-        ECR_REGISTRY_URL = ""  // Placeholder for now
+        ECR_REGISTRY_URL = "placeholder"  // Placeholder for now
         AWS_ACCOUNT_ID = "939533572395"
-        EC2_INSTANCE_IP = ""  // Placeholder for now
+        EC2_INSTANCE_IP = "placeholder"  // Placeholder for now
         SSH_USER = "ec2-user"
         SSH_KEY = credentials('ec2-ssh-key')
     }
