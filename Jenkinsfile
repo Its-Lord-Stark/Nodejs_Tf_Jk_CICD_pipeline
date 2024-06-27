@@ -60,10 +60,12 @@ pipeline {
                         bat "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY_URL}"
                     }
 
-                    echo "ECR Registry URL after login: ${env.ECR_REGISTRY_URL}"
+                    echo "ECR Registry URL after login: ${ECR_REGISTRY_URL}"
 
-                    docker.withRegistry("https://${ECR_REGISTRY_URL}", "ecr:ap-south-1:${AWS_ACCESS_KEY_ID}") {
+                    docker.withRegistry("https://${ECR_REGISTRY_URL}", "ecr:ap-south-1:${AWS_ACCOUNT_ID}") {
                         docker.image("${DOCKER_IMAGE_TAG}").push()
+
+                    echo "Work until here"
                     }
                 }
             }
