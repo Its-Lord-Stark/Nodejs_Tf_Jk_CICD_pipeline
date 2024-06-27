@@ -110,13 +110,14 @@ pipeline {
 //             }
 //         }
 
-stage('Deploy to EC2') {
+stages {
+        stage('Deploy to EC2') {
             steps {
                 script {
                     // Define the SSH command to execute remotely
                     def sshCommand = "docker pull ${ECR_REGISTRY_URL}/${DOCKER_IMAGE_TAG} && docker run -d -p 8100:8100 ${ECR_REGISTRY_URL}/${DOCKER_IMAGE_TAG}"
                     
-                    // Execute SSH command directly
+                    // Execute SSH command directly using 'bat' on Windows
                     def sshOutput = bat(script: "ssh -o StrictHostKeyChecking=no ${SSH_USER}@${EC2_INSTANCE_IP} '${sshCommand}'", returnStdout: true).trim()
                     
                     // Log the SSH output (if needed)
