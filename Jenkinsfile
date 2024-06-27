@@ -32,7 +32,6 @@ pipeline {
                                  string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')]) {
                     script {
                         bat 'terraform init'
-                        bat 'terraform destroy -auto-approve'
                         bat 'terraform apply -auto-approve'
 
                         // Capture the outputs from Terraform
