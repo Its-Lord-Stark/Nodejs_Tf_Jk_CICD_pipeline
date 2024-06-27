@@ -96,18 +96,34 @@ pipeline {
         }
 
 
+// stage('Deploy to EC2') {
+//             steps {
+//                 script {
+//                     sshagent(['ec2-ssh-key']) {
+//                         // Use Powershell instead of batch commands
+//                         powershell """
+//                         \$remoteCommand = "docker pull ${ECR_REGISTRY_URL}/${DOCKER_IMAGE_TAG} && docker run -d -p 8100:8100 ${ECR_REGISTRY_URL}/${DOCKER_IMAGE_TAG}"
+//                         ssh -o StrictHostKeyChecking=no ${SSH_USER}@${EC2_INSTANCE_IP} \$remoteCommand
+//                         """
+//                     }
+//                 }
+//             }
+//         }
+
 stage('Deploy to EC2') {
-            steps {
-                script {
-                    sshagent(['ec2-ssh-key']) {
-                        // Use Powershell instead of batch commands
-                        powershell """
-                        \$remoteCommand = "docker pull ${ECR_REGISTRY_URL}/${DOCKER_IMAGE_TAG} && docker run -d -p 8100:8100 ${ECR_REGISTRY_URL}/${DOCKER_IMAGE_TAG}"
-                        ssh -o StrictHostKeyChecking=no ${SSH_USER}@${EC2_INSTANCE_IP} \$remoteCommand
-                        """
-                    }
-                }
-            }
+    steps {
+        script {
+            // Define the SSH command to execute remotely
+            def sshCommand = "docker pull ${ECR_REGISTRY_URL}/${DOCKER_IMAGE_TAG} && docker run -d -p 8100:8100 ${ECR_REGISTRY_URL}/${DOCKER_IMAGE_TAG}"
+            
+            // Execute SSH command directly
+            def sshOutput = sh(script: "ssh -o StrictHostKeyChecking=no ${SSH_USER}@${EC2_INSTANCE_IP} '${sshCommand}'", returnStdout: true).trim()
+            
+            // Log the SSH output (if needed)
+            echo "SSH Command Output: ${sshOutput}"
         }
+    }
+}
+
     }
 }
