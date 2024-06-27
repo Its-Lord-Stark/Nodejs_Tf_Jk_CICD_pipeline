@@ -62,7 +62,7 @@ pipeline {
 
                     echo "ECR Registry URL after login: ${ECR_REGISTRY_URL}"
 
-                    docker.withRegistry("https://${ECR_REGISTRY_URL}", "ecr:ap-south-1:${AWS_ACCOUNT_ID}") {
+                    docker.withRegistry("https://${ECR_REGISTRY_URL}") {
                         docker.image("${DOCKER_IMAGE_TAG}").push()
 
                     echo "Work until here"
@@ -70,6 +70,8 @@ pipeline {
                 }
             }
         }
+
+        // , "ecr:ap-south-1:${AWS_ACCOUNT_ID}"
 
         stage('Deploy to EC2') {
             steps {
