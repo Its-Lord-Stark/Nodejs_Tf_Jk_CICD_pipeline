@@ -19,13 +19,14 @@ pipeline {
             }
         }
 
-        stage("Build Docker Image") {
-            steps {
-                script {
-                    // Use bat for Windows shell commands
-                    bat 'docker build -t ${DOCKER_IMAGE_TAG} .'
+        stage("Build docekr image")
+        {
+            steps{
+                script{
+                    docker.build("${DOCKER_IMAGE_TAG}", ".")
                 }
             }
+            
         }
 
         stage("Apply Terraform") {
