@@ -111,7 +111,7 @@ pipeline {
 //         }
 
 stage('Deploy to EC2') {
-               steps {
+            steps {
                 script {
                     // Define the SSH command to execute remotely
                     def sshCommand = "docker pull ${ECR_REGISTRY_URL}/${DOCKER_IMAGE_TAG} && docker run -d -p 8100:8100 ${ECR_REGISTRY_URL}/${DOCKER_IMAGE_TAG}"
@@ -123,7 +123,8 @@ stage('Deploy to EC2') {
                     echo "SSH Command Output: ${sshOutput}"
                 }
             }
-}
+        }
+    }
 
     }
-}
+
