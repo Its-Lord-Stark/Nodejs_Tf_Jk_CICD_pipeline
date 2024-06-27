@@ -34,7 +34,7 @@ pipeline {
                         bat 'terraform init'
                         bat 'terraform apply -auto-approve'
 
-                        def ec2InstanceIp = bat(script: 'terraform output -raw ec2_instance_ip', returnStdout: true).trim()
+                        def ec2InstanceIp = bat(script: 'terraform output -raw aws_instance_ip', returnStdout: true).trim()
                         def ecrRegistryUrl = bat(script: 'terraform output -raw ecr_repository_url', returnStdout: true).trim()
 
                         env.EC2_INSTANCE_IP = ec2InstanceIp
