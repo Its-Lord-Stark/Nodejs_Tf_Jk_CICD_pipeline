@@ -51,6 +51,27 @@ pipeline {
             }
         }
 
+        // stage('Push Docker Image to ECR') {
+        //     steps {
+        //         script {
+        //             echo "ECR Registry URL before login: ${ECR_REGISTRY_URL}"
+
+        //             withCredentials([string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'), 
+        //                              string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')]) {
+        //                 bat "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY_URL}"
+        //             }
+
+        //             echo "ECR Registry URL after login: ${ECR_REGISTRY_URL}"
+
+        //             docker.withRegistry("https://${ECR_REGISTRY_URL}") {
+        //                 docker.image("${DOCKER_IMAGE_TAG}").push()
+
+        //             echo "Work until here"
+        //             }
+        //         }
+        //     }
+        // }
+
         stage('Push Docker Image to ECR') {
             steps {
                 script {
@@ -63,16 +84,18 @@ pipeline {
 
                     echo "ECR Registry URL after login: ${ECR_REGISTRY_URL}"
 
-                    docker.withRegistry("https://${ECR_REGISTRY_URL}") {
-                        docker.image("${DOCKER_IMAGE_TAG}").push()
-
-                    echo "Work until here"
+                    retry(3) {
+                        script {
+                            echo "Pushing Docker image to ECR..."
+                            def pushCommand = "docker push ${ECR_REGISTRY_URL}/${DOCKER_IMAGE_TAG}"
+                            bat pushCommand
+                            echo "Docker image pushed successfully"
+                        }
                     }
                 }
             }
         }
 
-        // , "ecr:ap-south-1:${AWS_ACCOUNT_ID}"
 
         stage('Deploy to EC2') {
             steps {
