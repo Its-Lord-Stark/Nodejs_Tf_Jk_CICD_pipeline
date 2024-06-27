@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_iam_role" "my_instance_role" {
-  name = "ec2-instance-role"  
+  name = "ec2-instance-role"
   
   assume_role_policy = jsonencode({
     "Version": "2012-10-17",
@@ -19,45 +19,45 @@ resource "aws_iam_role" "my_instance_role" {
   })
 }
 
+resource "aws_iam_role_policy" "ecr_policy" {
+  name = "ecr-policy"
+  role = aws_iam_role.my_instance_role.id
+
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:PutImage",
+          "ecr:InitiateLayerUpload",
+          "ecr:UploadLayerPart",
+          "ecr:CompleteLayerUpload"
+        ],
+        "Resource": "${aws_ecr_repository.my_ecr_repo.arn}"
+      }
+    ]
+  })
+}
+
 resource "aws_instance" "my_instance" {
   ami           = var.ami_id
   instance_type = var.instance_type
-  
+
   tags = {
     Name = "node-server-instance"
   }
-  
-  iam_instance_profile =aws_iam_role.my_instance_role.name 
-  
+
+  iam_instance_profile = aws_iam_role.my_instance_role.name
 }
 
 resource "aws_ecr_repository" "my_ecr_repo" {
   name = "node-server-repo"
-  
+
   tags = {
     Environment = "Dev"
   }
-}
-
-data "aws_iam_policy_document" "ecr_policy" {
-  statement {
-    actions = [
-      "ecr:GetDownloadUrlForLayer",
-      "ecr:BatchGetImage",
-      "ecr:BatchCheckLayerAvailability",
-      "ecr:PutImage",
-      "ecr:InitiateLayerUpload",
-      "ecr:UploadLayerPart",
-      "ecr:CompleteLayerUpload"
-    ]
-    
-    resources = [
-      aws_ecr_repository.my_ecr_repo.arn 
-    ]
-  }
-}
-
-resource "aws_iam_role_policy_attachment" "ecr_policy_attachment" {
-  role       = aws_iam_role.my_instance_role.name
-  policy_arn = data.aws_iam_policy_document.ecr_policy 
 }
