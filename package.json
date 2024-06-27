@@ -1,0 +1,17 @@
+{
+  "name": "nodejscicd",
+  "version": "1.0.0",
+  "description": "This is NodeJs project with CICD pipeline",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js"
+  },
+  "author": "Stark",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "nodemon": "^3.1.4"
+  }
+}
