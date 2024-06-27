@@ -53,12 +53,16 @@ pipeline {
         stage('Push Docker Image to ECR') {
             steps {
                 script {
+                    echo "ECR Registry URL before login: ${env.ECR_REGISTRY_URL}"
+
                     withCredentials([string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'), 
                                      string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')]) {
-                        bat "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin https://${ECR_REGISTRY_URL}"
+                        bat "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${env.ECR_REGISTRY_URL}"
                     }
 
-                    docker.withRegistry("https://${ECR_REGISTRY_URL}", "ecr:ap-south-1:${AWS_ACCESS_KEY_ID}") {
+                    echo "ECR Registry URL after login: ${env.ECR_REGISTRY_URL}"
+
+                    docker.withRegistry("https://${env.ECR_REGISTRY_URL}", "ecr:ap-south-1:${AWS_ACCESS_KEY_ID}") {
                         docker.image("${DOCKER_IMAGE_TAG}").push()
                     }
                 }
