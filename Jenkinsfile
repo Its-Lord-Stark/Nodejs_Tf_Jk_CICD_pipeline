@@ -8,7 +8,7 @@ pipeline{
         AWS_ACCOUNT_ID = "939533572395"
         EC2_INSTANCE_IP = "PlaceHolder"
         SSH_USER = "ec2-user"
-        SSH_KEY = credentials('ssh-key-id')
+        SSH_KEY = credentials('ec2-ssh-key')
 
     }
 
