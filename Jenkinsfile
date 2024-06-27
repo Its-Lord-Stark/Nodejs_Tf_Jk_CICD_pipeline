@@ -78,17 +78,16 @@ pipeline {
 
                     withCredentials([string(credentialsId: 'aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'), 
                                      string(credentialsId: 'aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        // Login to ECR
                         bat "aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY_URL}"
                     }
 
                     echo "ECR Registry URL after login: ${ECR_REGISTRY_URL}"
 
                     retry(3) {
-                        script {
-                            echo "Pushing Docker image to ECR..."
-                            def pushCommand = "docker push ${ECR_REGISTRY_URL}}"
-                            bat pushCommand
-                            echo "Docker image pushed successfully"
+                        // Retry the docker push command up to 3 times
+                        docker.withRegistry("https://${ECR_REGISTRY_URL}") {
+                            docker.image("${DOCKER_IMAGE_TAG}").push()
                         }
                     }
                 }
