@@ -59,5 +59,5 @@ data "aws_iam_policy_document" "ecr_policy" {
 
 resource "aws_iam_role_policy_attachment" "ecr_policy_attachment" {
   role       = aws_iam_role.my_instance_role.name
-  policy_arn = aws_iam_policy_document.ecr_policy.arn 
+  policy_arn = data.aws_iam_policy_document.ecr_policy 
 }
