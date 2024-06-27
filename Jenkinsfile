@@ -39,12 +39,12 @@ pipeline {
                         def ecrRegistryUrl = bat(script: 'terraform output -raw ecr_repository_url', returnStdout: true).trim()
 
                         // Set the environment variables dynamically
-                        env.EC2_INSTANCE_IP = ec2InstanceIp
-                        env.ECR_REGISTRY_URL = ecrRegistryUrl
+                        EC2_INSTANCE_IP = ec2InstanceIp
+                        ECR_REGISTRY_URL = ecrRegistryUrl
 
                         // Print out the IP and URL for debugging
-                        echo "EC2 Instance IP: ${env.EC2_INSTANCE_IP}"
-                        echo "ECR Registry URL: ${env.ECR_REGISTRY_URL}"
+                        // echo "EC2 Instance IP: ${env.EC2_INSTANCE_IP}"
+                        // echo "ECR Registry URL: ${env.ECR_REGISTRY_URL}"
                     }
                 }
             }
