@@ -41,6 +41,9 @@ pipeline {
 
                         EC2_INSTANCE_IP = ec2InstanceIp.split("\n")[-1].trim()
                         ECR_REGISTRY_URL = ecrRegistryUrl.split("\n")[-1].trim()
+                        env.EC2_INSTANCE_IP = ec2InstanceIp.split("\n")[-1].trim()
+                        env.ECR_REGISTRY_URL = ecrRegistryUrl.split("\n")[-1].trim()
+                        
 
                     }
                 }
@@ -82,6 +85,7 @@ stage('Deploy to EC2') {
             if (!env.SSH_KEY || !env.SSH_USER || !EC2_INSTANCE_IP || !ECR_REGISTRY_URL || !TAG) {
                 error "One or more required variables are null or undefined."
             }
+
             
             withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key')]) {
                 def remoteCommand = """
