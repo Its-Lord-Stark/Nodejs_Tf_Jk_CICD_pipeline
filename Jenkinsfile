@@ -237,9 +237,8 @@ pipeline {
                             """
                             
                             sh """
-                                echo "${sshPrivateKey}" > ssh-key.pem
-                                chmod 400 ssh-key.pem
-                                ssh -i ssh-key.pem -o StrictHostKeyChecking=no ${env.SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'
+
+                                ssh -i NodeJSCicd.pem -o StrictHostKeyChecking=no ${env.SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'
                             """
                             
                             echo "SSH command executed successfully."
