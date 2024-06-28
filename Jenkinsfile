@@ -82,7 +82,7 @@ stage('Deploy to EC2') {
                     sudo docker run -d -p 8100:8100 ${ECR_REGISTRY_URL}
                 """
                 sh """
-                    ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ${SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'
+                    ssh -i ${env.SSH_KEY} -o StrictHostKeyChecking=no ${SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'
                 """
             }
         }
