@@ -85,29 +85,29 @@ stage('Deploy to EC2') {
             if (!env.SSH_KEY || !env.SSH_USER || !EC2_INSTANCE_IP || !ECR_REGISTRY_URL || !TAG) {
                 echo "One or more required variables are null or undefined. Deployment skipped."
                 currentBuild.result = 'ABORTED'
-                return
-            }
-
-            withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key')]) {
-                def remoteCommand = """
-                    aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION} | sudo docker login --username AWS --password-stdin ${ECR_REGISTRY_URL} &&
-                    sudo docker pull ${ECR_REGISTRY_URL}:${env.TAG} &&
-                    sudo docker run -d -p 8100:8100 ${ECR_REGISTRY_URL}:${env.TAG}
-                """
-                
-                echo "Executing SSH command:"
-                echo "ssh -i *** -o StrictHostKeyChecking=no ${env.SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'"
-                
-                // Execute SSH command only if all variables are defined
-                sh """
-                    ssh -i ${env.SSH_KEY} -o StrictHostKeyChecking=no ${env.SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'
-                """
-                
-                echo "SSH command executed successfully."
+            } else {
+                withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key')]) {
+                    def remoteCommand = """
+                        aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION} | sudo docker login --username AWS --password-stdin ${ECR_REGISTRY_URL}:${env.TAG} &&
+                        sudo docker pull ${ECR_REGISTRY_URL}:${env.TAG} &&
+                        sudo docker run -d -p 8100:8100 ${ECR_REGISTRY_URL}:${env.TAG}
+                    """
+                    
+                    echo "Executing SSH command:"
+                    echo "ssh -i *** -o StrictHostKeyChecking=no ${env.SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'"
+                    
+                    // Execute SSH command only if all variables are defined
+                    sh """
+                        ssh -i ${env.SSH_KEY} -o StrictHostKeyChecking=no ${env.SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'
+                    """
+                    
+                    echo "SSH command executed successfully."
+                }
             }
         }
     }
 }
+
 
 
 
