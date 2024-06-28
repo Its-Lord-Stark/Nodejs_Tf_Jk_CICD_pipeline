@@ -87,6 +87,8 @@ stage('Deploy to EC2') {
                 sh """
                     ssh -i ${env.SSH_KEY} -o StrictHostKeyChecking=no ${env.SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'
                 """
+                echo "Will it come here???"
+
             }
         }
     }
