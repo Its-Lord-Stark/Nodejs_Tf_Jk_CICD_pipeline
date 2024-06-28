@@ -77,44 +77,74 @@ pipeline {
 
 
 
-stage('Deploy to EC2') {
-    steps {
-        script {
-            echo "Deploying to EC2 with ECR Registry URL: ${ECR_REGISTRY_URL}, TAG: ${TAG}, SSH_USER: ${env.SSH_USER}, SSH_KEY: **** , EC2_INSTANCE_IP: ${EC2_INSTANCE_IP}"
+// stage('Deploy to EC2') {
+//     steps {
+//         script {
+//             echo "Deploying to EC2 with ECR Registry URL: ${ECR_REGISTRY_URL}, TAG: ${TAG}, SSH_USER: ${env.SSH_USER}, SSH_KEY: **** , EC2_INSTANCE_IP: ${EC2_INSTANCE_IP}"
             
-            // Check if critical variables are null or undefined
-            if (!env.SSH_KEY || !env.SSH_USER || !EC2_INSTANCE_IP || !ECR_REGISTRY_URL || !TAG) {
-                echo "One or more required variables are null or undefined. Deployment skipped."
-                currentBuild.result = 'ABORTED'
-                return
-            }
+//             // Check if critical variables are null or undefined
+//             if (!env.SSH_KEY || !env.SSH_USER || !EC2_INSTANCE_IP || !ECR_REGISTRY_URL || !TAG) {
+//                 echo "One or more required variables are null or undefined. Deployment skipped."
+//                 currentBuild.result = 'ABORTED'
+//                 return
+//             }
 
-            try {
-                withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key' , keyFileVariable: 'SSH_KEY_FILE')]) {
-                    def remoteCommand = """
-                        aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION} | sudo docker login --username AWS --password-stdin ${ECR_REGISTRY_URL}:${env.TAG} &&
-                        sudo docker pull ${ECR_REGISTRY_URL}:${env.TAG} &&
-                        sudo docker run -d -p 8100:8100 ${ECR_REGISTRY_URL}:${env.TAG}
-                    """
+//             try {
+//                 withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key' , keyFileVariable: 'SSH_KEY_FILE')]) {
+//                     def remoteCommand = """
+//                         aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION} | sudo docker login --username AWS --password-stdin ${ECR_REGISTRY_URL}:${env.TAG} &&
+//                         sudo docker pull ${ECR_REGISTRY_URL}:${env.TAG} &&
+//                         sudo docker run -d -p 8100:8100 ${ECR_REGISTRY_URL}:${env.TAG}
+//                     """
                     
-                    echo "Executing SSH command:"
-                    echo "ssh -i *** -o StrictHostKeyChecking=no ${env.SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'"
+//                     echo "Executing SSH command:"
+//                     echo "ssh -i *** -o StrictHostKeyChecking=no ${env.SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'"
                     
-                    // Execute SSH command only if all variables are defined
-                    sh """
-                        ssh -i ${SSH_KEY_FILE} -o StrictHostKeyChecking=no ${env.SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'
-                    """
+//                     // Execute SSH command only if all variables are defined
+//                     sh """
+//                         ssh -i ${SSH_KEY_FILE} -o StrictHostKeyChecking=no ${env.SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'
+//                     """
                     
-                    echo "SSH command executed successfully."
+//                     echo "SSH command executed successfully."
+//                 }
+//             } catch (Exception e) {
+//                 echo "Failed to deploy to EC2: ${e.message}"
+//                 currentBuild.result = 'FAILURE'
+//                 throw e
+//             }
+//         }
+//     }
+// }
+
+stage('Deploy to EC2') {
+            steps {
+                script {
+                    try {
+                        def sshPrivateKey = credentials('ec2-ssh-key')
+                        withEnv(["SSH_KEY=${sshPrivateKey}"]) {
+                            def remoteCommand = """
+                                aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION} | sudo docker login --username AWS --password-stdin ${ECR_REGISTRY_URL} &&
+                                sudo docker pull ${ECR_REGISTRY_URL}:${env.TAG} &&
+                                sudo docker run -d -p 8100:8100 ${ECR_REGISTRY_URL}:${env.TAG}
+                            """
+                            
+                            sh """
+                                ssh -i <<<(${sshPrivateKey}) -o StrictHostKeyChecking=no ${env.SSH_USER}@${env.EC2_INSTANCE_IP} '${remoteCommand}'
+                            """
+                            
+                            echo "SSH command executed successfully."
+                        }
+                    } catch (Exception e) {
+                        echo "Failed to deploy to EC2: ${e.message}"
+                        currentBuild.result = 'FAILURE'
+                        throw e
+                    }
                 }
-            } catch (Exception e) {
-                echo "Failed to deploy to EC2: ${e.message}"
-                currentBuild.result = 'FAILURE'
-                throw e
             }
         }
-    }
-}
+
+
+
 
 
 
