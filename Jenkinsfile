@@ -4,6 +4,7 @@ pipeline {
         TF_CLI_ARGS_INIT = "-input=false"
         AWS_DEFAULT_REGION = "ap-south-1"
         DOCKER_IMAGE_TAG = "node-server-repo:latest"
+        TAG = "latest"
         ECR_REGISTRY_URL = "placeholder"  // Placeholder for now
         AWS_ACCOUNT_ID = "939533572395"
         EC2_INSTANCE_IP = "placeholder"  // Placeholder for now
@@ -78,8 +79,8 @@ stage('Deploy to EC2') {
             withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key')]) {
                 def remoteCommand = """
                     aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION} | sudo docker login --username AWS --password-stdin ${ECR_REGISTRY_URL} &&
-                    sudo docker pull ${ECR_REGISTRY_URL} &&
-                    sudo docker run -d -p 8100:8100 ${ECR_REGISTRY_URL}
+                    sudo docker pull ${ECR_REGISTRY_URL}:${TAG} &&
+                    sudo docker run -d -p 8100:8100 ${ECR_REGISTRY_URL}:${TAG}
                 """
                 sh """
                     ssh -i ${env.SSH_KEY} -o StrictHostKeyChecking=no ${env.SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'
