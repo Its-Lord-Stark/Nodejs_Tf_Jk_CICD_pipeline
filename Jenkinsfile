@@ -223,22 +223,20 @@ pipeline {
                 }
             }
         }
-
+    stages {
         stage('Deploy to EC2') {
             steps {
                 script {
                     try {
-                        def sshPrivateKey = credentials('ec2-ssh-key')
-                        withEnv(["SSH_KEY=${sshPrivateKey}"]) {
+                        sshagent(['ec2-ssh-key']) {
                             def remoteCommand = """
                                 aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION} | sudo docker login --username AWS --password-stdin ${ECR_REGISTRY_URL}:${env.TAG} &&
                                 sudo docker pull ${ECR_REGISTRY_URL}:${env.TAG} &&
                                 sudo docker run -d -p 8100:8100 ${ECR_REGISTRY_URL}:${env.TAG}
                             """
-                            
-                            sh """
 
-                                ssh -i NodeJSCicd.pem -o StrictHostKeyChecking=no ${env.SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'
+                            sh """
+                                ssh -o StrictHostKeyChecking=no ${env.SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'
                             """
                             
                             echo "SSH command executed successfully."
@@ -251,5 +249,6 @@ pipeline {
                 }
             }
         }
+    }
     }
 }
