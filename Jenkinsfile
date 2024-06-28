@@ -79,7 +79,7 @@ pipeline {
 stage('Deploy to EC2') {
     steps {
         script {
-            echo "Deploying to EC2 with ECR Registry URL: ${ECR_REGISTRY_URL}, TAG: ${TAG}, SSH_USER: ${env.SSH_USER}, SSH_KEY: ${env.SSH_KEY}, EC2_INSTANCE_IP: ${EC2_INSTANCE_IP}"
+            echo "Deploying to EC2 with ECR Registry URL: ${ECR_REGISTRY_URL}, TAG: ${TAG}, SSH_USER: ${env.SSH_USER}, SSH_KEY: **** , EC2_INSTANCE_IP: ${EC2_INSTANCE_IP}"
             
             // Check if critical variables are null or undefined
             if (!env.SSH_KEY || !env.SSH_USER || !EC2_INSTANCE_IP || !ECR_REGISTRY_URL || !TAG) {
