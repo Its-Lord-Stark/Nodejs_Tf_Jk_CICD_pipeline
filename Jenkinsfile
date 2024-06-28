@@ -10,6 +10,7 @@ pipeline {
         EC2_INSTANCE_IP = "placeholder"  // Placeholder for now
         SSH_USER = "ec2-user"
         SSH_KEY = credentials('ec2-ssh-key')
+
     }
 
     stages {
