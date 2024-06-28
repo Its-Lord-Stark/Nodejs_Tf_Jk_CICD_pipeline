@@ -2,6 +2,14 @@ provider "aws" {
   region = "ap-south-1"
 }
 
+resource "aws_ecr_repository" "my_ecr_repo" {
+  name = "node-server-repo"
+
+  tags = {
+    Environment = "Dev"
+  }
+}
+
 resource "aws_iam_role" "my_instance_role" {
   name = "ec2-instance-role"
   
@@ -17,11 +25,6 @@ resource "aws_iam_role" "my_instance_role" {
       }
     ]
   })
-}
-
-resource "aws_iam_instance_profile" "my_instance_profile" {
-  name = "ec2-instance-profile"
-  role = aws_iam_role.my_instance_role.name
 }
 
 resource "aws_iam_role_policy" "ecr_policy" {
@@ -41,30 +44,27 @@ resource "aws_iam_role_policy" "ecr_policy" {
           "ecr:InitiateLayerUpload",
           "ecr:UploadLayerPart",
           "ecr:CompleteLayerUpload",
-          "ecr:GetAuthorizationToken"
+          "ecr:GetAuthorizationToken"  # Added permission
         ],
-        "Resource": "${aws_ecr_repository.my_ecr_repo.arn}"
+        "Resource": "*"
       }
     ]
   })
 }
 
+resource "aws_iam_instance_profile" "my_instance_profile" {
+  name = "ec2-instance-profile"
+  role = aws_iam_role.my_instance_role.name
+}
+
 resource "aws_instance" "my_instance" {
   ami           = var.ami_id
   instance_type = var.instance_type
-  key_name      = "NodeJSCicd" 
+  key_name      = "NodeJSCicd"
 
   tags = {
     Name = "node-server-instance"
   }
 
   iam_instance_profile = aws_iam_instance_profile.my_instance_profile.name
-}
-
-resource "aws_ecr_repository" "my_ecr_repo" {
-  name = "node-server-repo"
-
-  tags = {
-    Environment = "Dev"
-  }
 }
