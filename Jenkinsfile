@@ -85,7 +85,10 @@ stage('Deploy to EC2') {
             if (!env.SSH_KEY || !env.SSH_USER || !EC2_INSTANCE_IP || !ECR_REGISTRY_URL || !TAG) {
                 echo "One or more required variables are null or undefined. Deployment skipped."
                 currentBuild.result = 'ABORTED'
-            } else {
+                return
+            }
+
+            try {
                 withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key')]) {
                     def remoteCommand = """
                         aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION} | sudo docker login --username AWS --password-stdin ${ECR_REGISTRY_URL}:${env.TAG} &&
@@ -103,10 +106,15 @@ stage('Deploy to EC2') {
                     
                     echo "SSH command executed successfully."
                 }
+            } catch (Exception e) {
+                echo "Failed to deploy to EC2: ${e.message}"
+                currentBuild.result = 'FAILURE'
+                throw e
             }
         }
     }
 }
+
 
 
 
