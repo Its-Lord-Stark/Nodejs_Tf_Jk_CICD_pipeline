@@ -7,7 +7,7 @@ pipeline {
         ECR_REGISTRY_URL = "placeholder"  // Placeholder for now
         AWS_ACCOUNT_ID = "939533572395"
         EC2_INSTANCE_IP = "placeholder"  // Placeholder for now
-        SSH_USER = "ec2-user"
+        SSH_USER = "root"
         SSH_KEY = credentials('ec2-ssh-key')
     }
 
@@ -102,9 +102,9 @@ stage('Deploy to EC2') {
         script {
             withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key', keyFileVariable: 'SSH_KEY_PATH')]) {
                 def remoteCommand = """
-                    aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | sudo docker login --username AWS --password-stdin ${ECR_REGISTRY_URL} &&
+                    aws ecr get-login-password --region ${AWS_DEFAULT_REGION}/ | sudo docker login --username AWS --password-stdin ${ECR_REGISTRY_URL} &&
                     sudo docker pull ${ECR_REGISTRY_URL} &&
-                    sudo docker run -d -p 8100:8100 ${ECR_REGISTRY_URL}
+                    sudo docker run -d -p 8100:8100 ${ECR_REGISTRY_URL}/
                 """
                 sh """
                     ssh -i ${SSH_KEY_PATH} -o StrictHostKeyChecking=no ${SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'
