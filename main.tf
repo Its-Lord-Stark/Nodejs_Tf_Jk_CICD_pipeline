@@ -40,7 +40,8 @@ resource "aws_iam_role_policy" "ecr_policy" {
           "ecr:PutImage",
           "ecr:InitiateLayerUpload",
           "ecr:UploadLayerPart",
-          "ecr:CompleteLayerUpload"
+          "ecr:CompleteLayerUpload",
+          "ecr:GetAuthorizationToken"
         ],
         "Resource": "${aws_ecr_repository.my_ecr_repo.arn}"
       }
