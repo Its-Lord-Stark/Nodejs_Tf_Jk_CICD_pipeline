@@ -223,7 +223,7 @@ pipeline {
                 }
             }
         }
-    stages {
+    
         stage('Deploy to EC2') {
             steps {
                 script {
@@ -248,7 +248,7 @@ pipeline {
                     }
                 }
             }
-        }
+        
     }
     }
 }
