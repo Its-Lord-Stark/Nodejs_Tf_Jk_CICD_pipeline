@@ -76,6 +76,8 @@ pipeline {
 stage('Deploy to EC2') {
     steps {
         script {
+            echo "Deploying to EC2 with ECR Registry URL: ${ECR_REGISTRY_URL}, TAG: ${TAG}, SSH_USER: ${env.SSH_USER}, SSH_KEY: ${env.SSH_KEY}, EC2_INSTANCE_IP: ${EC2_INSTANCE_IP}"
+            
             withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key')]) {
                 def remoteCommand = """
                     aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION} | sudo docker login --username AWS --password-stdin ${ECR_REGISTRY_URL} &&
@@ -89,6 +91,7 @@ stage('Deploy to EC2') {
         }
     }
 }
+
 
     }
 }
