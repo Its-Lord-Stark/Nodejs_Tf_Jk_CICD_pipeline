@@ -84,6 +84,9 @@ stage('Deploy to EC2') {
                     sudo docker pull ${ECR_REGISTRY_URL}:${env.TAG} &&
                     sudo docker run -d -p 8100:8100 ${ECR_REGISTRY_URL}:${env.TAG}
                 """
+
+                echo "Will it come here???"
+                
                 sh """
                     ssh -i ${env.SSH_KEY} -o StrictHostKeyChecking=no ${env.SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'
                 """
