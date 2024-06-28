@@ -90,7 +90,7 @@ stage('Deploy to EC2') {
             }
 
             try {
-                withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key' , keyFileVariable: 'SSH_KEY_FILE')]) {
                     def remoteCommand = """
                         aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION} | sudo docker login --username AWS --password-stdin ${ECR_REGISTRY_URL}:${env.TAG} &&
                         sudo docker pull ${ECR_REGISTRY_URL}:${env.TAG} &&
@@ -102,7 +102,7 @@ stage('Deploy to EC2') {
                     
                     // Execute SSH command only if all variables are defined
                     sh """
-                        ssh -i ${env.SSH_KEY} -o StrictHostKeyChecking=no ${env.SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'
+                        ssh -i ${SSH_KEY_FILE} -o StrictHostKeyChecking=no ${env.SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'
                     """
                     
                     echo "SSH command executed successfully."
