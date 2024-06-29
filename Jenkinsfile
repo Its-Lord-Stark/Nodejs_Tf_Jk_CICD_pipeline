@@ -6,11 +6,11 @@ pipeline {
         AWS_DEFAULT_REGION = "ap-south-1"
         DOCKER_IMAGE_TAG = "node-server-repo:latest"
         TAG = "latest"
-        ECR_REGISTRY_URL = "placeholder"  // Placeholder for now
+        ECR_REGISTRY_URL = "placeholder"  
         AWS_ACCOUNT_ID = "939533572395"
-        EC2_INSTANCE_IP = "placeholder"  // Placeholder for now
+        EC2_INSTANCE_IP = "placeholder"  
         SSH_USER = "ec2-user"
-        SSH_KEY = credentials('ec2-ssh-key')  // Assuming 'ec2-ssh-key' is the ID of your SSH private key credential
+        SSH_KEY = credentials('ec2-ssh-key')  
     }
 
     stages {
@@ -36,7 +36,7 @@ pipeline {
                         bat 'terraform init'
                         bat 'terraform apply -auto-approve'
 
-                        // Capture the outputs from Terraform
+ 
                         def ec2InstanceIp = bat(script: 'terraform output -raw aws_instance_ip', returnStdout: true).trim()
                         def ecrRegistryUrl = bat(script: 'terraform output -raw ecr_repository_url', returnStdout: true).trim()
 
