@@ -3,6 +3,7 @@ variable "ami_id" {
     type =string 
 }
 
+
 variable "instance_type" {
     description = "Type of instance to launch"
     type = string
