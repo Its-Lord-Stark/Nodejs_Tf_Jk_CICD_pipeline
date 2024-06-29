@@ -72,31 +72,33 @@ pipeline {
             }
         }
     
-        stage('Deploy to EC2') {
-            steps {
-                script {
-                    try {
-                        sshagent(['ec2-ssh-key']) {
-                            def remoteCommand = """
-                                aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION} | sudo docker login --username AWS --password-stdin ${ECR_REGISTRY_URL}:${env.TAG} &&
-                                sudo docker pull ${ECR_REGISTRY_URL}:${env.TAG} &&
-                                sudo docker run -d -p 8100:8100 ${ECR_REGISTRY_URL}:${env.TAG}
-                            """
+stage('Deploy to EC2') {
+    steps {
+        script {
+            try {
+                sshagent(['ec2-ssh-key']) {
+                    def remoteCommand = """
+                        sudo docker ps -q --filter "name=my-container" | grep -q . && sudo docker stop my-container && sudo docker rm my-container || true
+                        sudo docker images -q ${ECR_REGISTRY_URL}:${env.TAG} | grep -q . && sudo docker rmi ${ECR_REGISTRY_URL}:${env.TAG} || true
+                        aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION} | sudo docker login --username AWS --password-stdin ${ECR_REGISTRY_URL}
+                        sudo docker pull ${ECR_REGISTRY_URL}:${env.TAG}
+                        sudo docker run -d --name my-container -p 8100:8100 ${ECR_REGISTRY_URL}:${env.TAG}
+                    """
 
-                            sh """
-                                ssh -o StrictHostKeyChecking=no ${env.SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'
-                            """
-                            
-                            echo "SSH command executed successfully."
-                        }
-                    } catch (Exception e) {
-                        echo "Failed to deploy to EC2: ${e.message}"
-                        currentBuild.result = 'FAILURE'
-                        throw e
-                    }
+                    sh """
+                        ssh -o StrictHostKeyChecking=no ${env.SSH_USER}@${EC2_INSTANCE_IP} '${remoteCommand}'
+                    """
+                    
+                    echo "SSH command executed successfully."
                 }
+            } catch (Exception e) {
+                echo "Failed to deploy to EC2: ${e.message}"
+                currentBuild.result = 'FAILURE'
+                throw e
             }
-        
+        }
     }
+}
+
     }
 }
