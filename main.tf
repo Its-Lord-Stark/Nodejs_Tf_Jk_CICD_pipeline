@@ -6,7 +6,7 @@ resource "aws_ecr_repository" "my_ecr_repo" {
   name = "node-server-repo"
 
   tags = {
-    Environment = "DEVV"
+    Environment = "DEV"
   }
 }
 
