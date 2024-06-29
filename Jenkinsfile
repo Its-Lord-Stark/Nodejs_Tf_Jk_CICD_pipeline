@@ -78,11 +78,12 @@ stage('Deploy to EC2') {
             try {
                 sshagent(['ec2-ssh-key']) {
                     def remoteCommand = """
-                        sudo docker ps -q --filter "name=my-container" | grep -q . && sudo docker stop my-container && sudo docker rm my-container || true
-                        sudo docker images -q ${ECR_REGISTRY_URL}:${env.TAG} | grep -q . && sudo docker rmi ${ECR_REGISTRY_URL}:${env.TAG} || true
+                        sudo docker stop \$(sudo docker ps -aq) || true
+                        sudo docker rm \$(sudo docker ps -aq) || true
+                        sudo docker rmi -f \$(sudo docker images -q) || true
                         aws ecr get-login-password --region ${env.AWS_DEFAULT_REGION} | sudo docker login --username AWS --password-stdin ${ECR_REGISTRY_URL}
                         sudo docker pull ${ECR_REGISTRY_URL}:${env.TAG}
-                        sudo docker run -d --name my-container -p 8100:8100 ${ECR_REGISTRY_URL}:${env.TAG}
+                        sudo docker run -d -p 8100:8100 ${ECR_REGISTRY_URL}:${env.TAG}
                     """
 
                     sh """
@@ -99,6 +100,7 @@ stage('Deploy to EC2') {
         }
     }
 }
+
 
     }
 }
