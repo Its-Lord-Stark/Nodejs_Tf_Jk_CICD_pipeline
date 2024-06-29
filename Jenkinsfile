@@ -66,7 +66,7 @@ pipeline {
                             docker.image("${DOCKER_IMAGE_TAG}").push()
                         }
 
-                        echo "Push to ECR successful."
+                        echo "Push to ECR successfully done."
                     }
                 }
             }
